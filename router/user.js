@@ -8,12 +8,14 @@ router.get("/signin", (req, res) => {
 
 router.post("/signin", async (req, res) => {
     const { email, password } = req.body
-    let d = await User.mathPassword(email, password)
-    console.log("datatatata------", d)
-
-    res.redirect("/")
-
-
+    try{
+        let token = await User.matchPasswordAndGenerateToken(email, password)
+        res.cookie('token',token).redirect("/")
+    }catch(error){
+        return res.render("signin",{error : "Incorrect email or password"})
+    }  
+    
+    
 })
 
 router.get("/signup", (req, res) => {
@@ -29,6 +31,10 @@ router.post("/signup", (req, res) => {
     })
 
     return res.redirect("/");
+})
+
+router.get("/logout",(req,res)=>{
+    res.clearCookie("token").redirect("/")
 })
 
 
